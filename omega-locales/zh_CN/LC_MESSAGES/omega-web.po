@@ -60,6 +60,15 @@ msgstr ""
 "则表达式</a>匹配主机。<br>正则表达式很难编写，且可读性差。<br>因此，多数情况下建议使用通配符，只在其他任何条件类型都不能达到的情况下使用正则表"
 "达式。"
 
+msgid "condition_GeositeCondition"
+msgstr "Geosite"
+
+msgid "condition_help_GeositeCondition"
+msgstr ""
+"通过预生成的 v2fly/domain-list-community geosite 分组匹配域名。<br>"
+"例如：<code>cn</code>、<code>google@ads</code>、"
+"<code>geolocation-!cn</code>。"
+
 msgid "condition_HostLevelsCondition"
 msgstr "域名层数"
 

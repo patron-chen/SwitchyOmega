@@ -83,8 +83,9 @@ module.exports = exports =
           refs['+' + profile] = profile
       refs
 
-    # For the omega rule list format, please see the following wiki page:
-    # https://github.com/FelisCatus/SwitchyOmega/wiki/SwitchyOmega-conditions-format
+    # For the omega rule list format, please see:
+    # https://github.com/FelisCatus/SwitchyOmega/wiki/
+    # SwitchyOmega-conditions-format
     compose: ({rules, defaultProfileName}, {withResult, useExclusive} = {}) ->
       eol = '\r\n'
       ruleList = '[SwitchyOmega Conditions]' + eol

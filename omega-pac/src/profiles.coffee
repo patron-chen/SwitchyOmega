@@ -236,6 +236,10 @@ module.exports = exports =
     return cache.compiled if cache.compiled
     handler = exports._handler(opt_profileType)
     cache.compiled = handler.compile.call(exports, profile, cache)
+  geositeReferenceSet: (profile, opt_profileType) ->
+    opt_profileType ?= profile.profileType
+    handler = exports._handler(opt_profileType)
+    handler.geositeReferenceSet?.call(exports, profile) ? {}
 
   _profileCache: new AttachedCache (profile) -> profile.revision
 
@@ -404,6 +408,11 @@ module.exports = exports =
         for rule in profile.rules
           refs[exports.nameAsKey(rule.profileName)] = rule.profileName
         refs
+      geositeReferenceSet: (profile) ->
+        refs = {}
+        for rule in profile.rules ? []
+          Conditions.collectGeositeRefs(rule.condition, refs)
+        refs
       analyze: (profile) -> profile.rules
       replaceRef: (profile, fromName, toName) ->
         changed = false
@@ -479,6 +488,11 @@ module.exports = exports =
           ruleList = formatHandler.preprocess(ruleList)
         return formatHandler.parse(ruleList, profile.matchProfileName,
           profile.defaultProfileName)
+      geositeReferenceSet: (profile) ->
+        refs = {}
+        for rule in exports.analyze(profile)
+          Conditions.collectGeositeRefs(rule.condition, refs)
+        refs
       match: (profile, request) ->
         result = exports.match(profile, request, 'SwitchProfile')
       compile: (profile) ->

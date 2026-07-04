@@ -1,5 +1,13 @@
 U2 = require 'uglify-js'
 Profiles = require './profiles'
+Geosite = require './geosite'
+
+# coffeelint: disable=camel_case_classes
+class AST_Raw extends U2.AST_SymbolRef
+  # coffeelint: enable=camel_case_classes
+  constructor: (raw) ->
+    U2.AST_SymbolRef.call(this, name: raw)
+    @aborts = -> false
 
 # PacGenerator is used like a singleton class instance.
 # coffeelint: disable=missing_fat_arrows
@@ -27,6 +35,7 @@ module.exports =
       profile = Profiles.byName(profile, options)
     refs = Profiles.allReferenceSet(profile, options,
       profileNotFound: args?.profileNotFound)
+    geositeRefs = {}
 
     profiles = new U2.AST_Object properties:
       for key, name of refs when key != '+direct'
@@ -36,6 +45,8 @@ module.exports =
           Profiles.byName(name, options)
         if not p?
           p = Profiles.profileNotFound(name, args?.profileNotFound)
+        for ref of Profiles.geositeReferenceSet(p)
+          geositeRefs[ref] = true
         new U2.AST_ObjectKeyVal(key: key, value: Profiles.compile(p))
 
     factory = new U2.AST_Function(
@@ -143,7 +154,11 @@ module.exports =
         ]
       )]
     )
-    new U2.AST_Toplevel body: [new U2.AST_Var definitions: [
+    body = []
+    geositeRefList = (ref for ref of geositeRefs)
+    if geositeRefList.length
+      body.push new AST_Raw Geosite.pacSourceFor(geositeRefList) + '\n'
+    body.push new U2.AST_Var definitions: [
       new U2.AST_VarDef(
         name: new U2.AST_SymbolVar name: 'FindProxyForURL'
         value: new U2.AST_Call(
@@ -154,5 +169,6 @@ module.exports =
           ]
         )
       )
-    ]]
+    ]
+    new U2.AST_Toplevel body: body
   # coffeelint: enable=missing_fat_arrows
