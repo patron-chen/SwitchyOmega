@@ -63,6 +63,7 @@ angular.module('omega').controller 'SwitchProfileCtrl', ($scope, $rootScope,
       group: 'default'
       types: [
         'HostWildcardCondition'
+        'GeositeCondition'
         'UrlWildcardCondition'
         'UrlRegexCondition'
         'FalseCondition'
@@ -76,6 +77,7 @@ angular.module('omega').controller 'SwitchProfileCtrl', ($scope, $rootScope,
       types: [
         'HostWildcardCondition'
         'HostRegexCondition'
+        'GeositeCondition'
         'HostLevelsCondition'
         'IpCondition'
       ]

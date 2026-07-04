@@ -38,6 +38,22 @@ This project contains a PAC generating module called `omega-pac`, which handles
 the profiles model and compile profiles into PAC scripts. This module is standalone
 and can be published to npm when the documentation is ready.
 
+## Geosite rule data
+ZeroOmega can use v2fly/domain-list-community `geosite.dat` / `dlc.dat` data
+through generated PAC matcher data. The raw dat file is not required at
+extension runtime.
+
+Put `geosite.dat` under `geo/`, then generate the local data module:
+
+    node tools/build-geosite.js
+
+After generation, Switch rules can use the `Geosite` condition with values like
+`cn`, `private`, `google@ads`, or `geolocation-!cn`. In a SwitchyOmega rule list,
+use the same rules as `geosite:cn +proxy`.
+
+The data source and syntax are documented by v2fly/domain-list-community:
+https://github.com/v2fly/domain-list-community
+
 ## Options manager
 The folder `omega-target` contains browser-independent logic for managing the
 options and applying profiles. Every public method is well documented in the comments.

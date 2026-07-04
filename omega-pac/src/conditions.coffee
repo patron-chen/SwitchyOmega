@@ -1,6 +1,7 @@
 U2 = require 'uglify-js'
 IP = require 'ip-address'
 Url = require 'url'
+Geosite = require './geosite'
 {shExp2RegExp, escapeSlash} = require './shexp_utils'
 {AttachedCache} = require './utils'
 
@@ -35,6 +36,8 @@ module.exports = exports =
     handler = exports._handler(condition.conditionType)
     cache.compiled = handler.compile.call(exports, condition, cache)
   str: (condition, {abbr} = {abbr: -1}) ->
+    if condition.conditionType == 'GeositeCondition'
+      return 'geosite:' + condition.pattern
     handler = exports._handler(condition.conditionType)
     if handler.abbrs[0].length == 0
       endCode = condition.pattern.charCodeAt(condition.pattern.length - 1)
@@ -54,6 +57,11 @@ module.exports = exports =
   colonCharCode: ':'.charCodeAt(0)
   fromStr: (str) ->
     str = str.trim()
+    if str.substr(0, 8).toLowerCase() == 'geosite:'
+      return {
+        conditionType: 'GeositeCondition'
+        pattern: str.substr(8).trim()
+      }
     i = str.indexOf(' ')
     i = str.length if i < 0
     if str.charCodeAt(i - 1) == exports.colonCharCode
@@ -197,6 +205,9 @@ module.exports = exports =
 
   localHosts: ["127.0.0.1", "[::1]", "localhost"]
 
+  collectGeositeRefs: (condition, out = {}) ->
+    Geosite.addReferences(condition, out)
+
   getWeekdayList: (condition) ->
     if condition.days
       condition.days.charCodeAt(i) > 64 for i in [0...7]
@@ -279,7 +290,8 @@ module.exports = exports =
       analyze: (condition) ->
         parts = for pattern in condition.pattern.split('|') when pattern
           # Get the magical regex of this pattern. See
-          # https://github.com/FelisCatus/SwitchyOmega/wiki/Host-wildcard-condition
+          # https://github.com/FelisCatus/SwitchyOmega/wiki/
+          # Host-wildcard-condition
           # for the magic.
           if pattern.charCodeAt(0) == '.'.charCodeAt(0)
             pattern = '*' + pattern
@@ -296,6 +308,23 @@ module.exports = exports =
         return cache.analyzed.test(request.host)
       compile: (condition, cache) ->
         @regTest 'host', cache.analyzed
+
+    'GeositeCondition':
+      abbrs: ['GS', 'Geosite']
+      analyze: (condition) -> Geosite.parseSpec(condition.pattern)
+      match: (condition, request) ->
+        Geosite.match(condition.pattern, request.host)
+      compile: (condition) ->
+        new U2.AST_Call(
+          args: [
+            new U2.AST_SymbolRef name: 'host'
+            new U2.AST_String value: condition.pattern
+          ]
+          expression: new U2.AST_SymbolRef name: '__omega_geosite_match'
+        )
+      fromStr: (str, condition) ->
+        condition.pattern = str
+        condition
 
     'BypassCondition':
       abbrs: ['B', 'Bypass']
@@ -369,7 +398,8 @@ module.exports = exports =
         return false if cache.ip? and not @match cache.ip, request
         if cache.host?
           if cache.host == '<local>'
-            # https://code.google.com/p/chromium/codesearch#chromium/src/net/proxy/proxy_bypass_rules.cc&sq=package:chromium&l=67
+            # https://code.google.com/p/chromium/codesearch#
+            # chromium/src/net/proxy/proxy_bypass_rules.cc
             # We align with Chromium's behavior of bypassing 127.0.0.1, ::1 as
             # well as any host without dots.
             #
@@ -539,7 +569,8 @@ module.exports = exports =
         if not cache.addr.v4
           # Example: isInNetEx(host,"fefe:13::abc/33")
           # For documentation on the isInNetEx function, see:
-          # https://msdn.microsoft.com/en-us/library/windows/desktop/gg308479(v=vs.85).aspx
+          # https://msdn.microsoft.com/en-us/library/windows/desktop/
+          # gg308479(v=vs.85).aspx
           hostIsInNetEx = new U2.AST_Call(
             expression: new U2.AST_SymbolRef name: 'isInNetEx'
             args: [

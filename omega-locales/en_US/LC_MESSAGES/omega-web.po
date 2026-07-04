@@ -65,6 +65,15 @@ msgstr ""
 "recommended to use wildcards for most cases and only use regex for conditions "
 "that cannot be achieved by any other condition type."
 
+msgid "condition_GeositeCondition"
+msgstr "Geosite"
+
+msgid "condition_help_GeositeCondition"
+msgstr ""
+"Matches hosts by a generated v2fly/domain-list-community geosite group.<br>"
+"Examples: <code>cn</code>, <code>google@ads</code>, "
+"<code>geolocation-!cn</code>."
+
 msgid "condition_HostLevelsCondition"
 msgstr "Host levels"
 

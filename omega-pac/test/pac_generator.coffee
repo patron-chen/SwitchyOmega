@@ -3,6 +3,17 @@ should = chai.should()
 
 describe 'PacGenerator', ->
   PacGenerator = require '../src/pac_generator.coffee'
+  Geosite = require '../src/geosite'
+  before ->
+    Geosite.setData
+      version: 1
+      groups:
+        cn:
+          plain: []
+          regexp: []
+          domain: ['example.cn']
+          full: []
+          attrs: {}
 
   options =
     '+auto':
@@ -11,6 +22,10 @@ describe 'PacGenerator', ->
       revision: 'test'
       defaultProfileName: 'direct'
       rules: [
+        {
+          profileName: 'proxy'
+          condition: {conditionType: 'GeositeCondition', pattern: 'cn'}
+        }
         {profileName: 'proxy', condition:
           conditionType: 'UrlRegexCondition'
           pattern: '^http://(www|www2)\\.example\\.com/'
@@ -46,6 +61,8 @@ describe 'PacGenerator', ->
     pac.should.not.be.empty
     func = eval("(function () { #{pac}\n return FindProxyForURL; })()")
     result = func('http://www.example.com/', 'www.example.com')
+    result.should.equal('PROXY 127.0.0.1:8888')
+    result = func('https://www.example.cn/', 'www.example.cn')
     result.should.equal('PROXY 127.0.0.1:8888')
   it 'should be able to compress pac scripts', ->
     ast = PacGenerator.script(options, 'auto')

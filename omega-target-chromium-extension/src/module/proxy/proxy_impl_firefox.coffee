@@ -100,11 +100,13 @@ class FirefoxProxyImpl extends ProxyImpl
       port: proxy.port
     if proxyInfo.type == 'socks5'
       # MOZ: SOCKS5 proxies should be specified as "type": "socks".
-      # https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/proxy/ProxyInfo
+      # https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/
+      # proxy/ProxyInfo
       proxyInfo.type = 'socks'
       if auth
         # Username & password here are only available for SOCKS5.
-        # https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/proxy/ProxyInfo
+        # https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/
+        # proxy/ProxyInfo
         # HTTP proxy auth must be handled via webRequest.onAuthRequired.
         proxyInfo.username = auth.username
         proxyInfo.password = auth.password

@@ -4,7 +4,29 @@ lolex = require 'lolex'
 
 describe 'Conditions', ->
   Conditions = require '../src/conditions'
+  Geosite = require '../src/geosite'
   U2 = require 'uglify-js'
+  before ->
+    Geosite.setData
+      version: 1
+      groups:
+        google:
+          plain: ['google']
+          regexp: ['^odd[1-7]\\.example\\.org$']
+          domain: ['google.com']
+          full: ['analytics.google.com']
+          attrs:
+            ads:
+              plain: []
+              regexp: []
+              domain: []
+              full: ['analytics.google.com']
+        cn:
+          plain: []
+          regexp: []
+          domain: ['example.cn']
+          full: []
+          attrs: {}
   testCond = (condition, request, should_match) ->
     o_request = request
     should_match = !!should_match
@@ -23,7 +45,18 @@ describe 'Conditions', ->
         new U2.AST_Return value: condExpr
       ]
     )
-    testFunc = eval '(' + testFunc.print_to_string() + ')'
+    testFuncSource = testFunc.print_to_string()
+    if condition.conditionType == 'GeositeCondition'
+      geositeData = JSON.stringify(Geosite.dataFor([condition.pattern]))
+      testFunc = eval """
+        (function () {
+          var __omega_geosite_data = #{geositeData};
+          #{Geosite.pacMatcherSource()}
+          return #{testFuncSource};
+        })()
+      """
+    else
+      testFunc = eval '(' + testFuncSource + ')'
     compileResult = testFunc(request.url, request.host, request.scheme)
 
     friendlyError = (compiled) ->
@@ -139,6 +172,43 @@ describe 'Conditions', ->
       testCond(cond, 'http://a.example.com/abc', 'match')
       testCond(cond, 'http://example.net/def', 'match')
       testCond(cond, 'http://c.example.org/ghi', not 'match')
+
+  describe 'GeositeCondition', ->
+    it 'should parse geosite shorthand', ->
+      Conditions.fromStr('geosite:cn').should.eql(
+        conditionType: 'GeositeCondition'
+        pattern: 'cn'
+      )
+      Conditions.fromStr('Geosite: google@ads').should.eql(
+        conditionType: 'GeositeCondition'
+        pattern: 'google@ads'
+      )
+    it 'should match root domains and subdomains', ->
+      cond =
+        conditionType: 'GeositeCondition'
+        pattern: 'cn'
+      testCond(cond, 'https://example.cn/', 'match')
+      testCond(cond, 'https://www.example.cn/', 'match')
+      testCond(cond, 'https://example.com/', not 'match')
+    it 'should match full domains exactly', ->
+      cond =
+        conditionType: 'GeositeCondition'
+        pattern: 'google@ads'
+      testCond(cond, 'https://analytics.google.com/', 'match')
+      testCond(cond, 'https://www.analytics.google.com/', not 'match')
+    it 'should match keyword and regexp rules by host', ->
+      cond =
+        conditionType: 'GeositeCondition'
+        pattern: 'google'
+      testCond(cond, 'https://mail.google.test/', 'match')
+      testCond(cond, 'https://odd3.example.org/', 'match')
+      testCond(cond, 'https://odd8.example.org/', not 'match')
+    it 'should filter by attributes', ->
+      cond =
+        conditionType: 'GeositeCondition'
+        pattern: 'google@ads'
+      testCond(cond, 'https://analytics.google.com/', 'match')
+      testCond(cond, 'https://google.com/', not 'match')
 
   describe 'BypassCondition', ->
     # See https://developer.chrome.com/extensions/proxy#bypass_list

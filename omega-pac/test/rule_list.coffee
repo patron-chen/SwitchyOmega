@@ -378,6 +378,27 @@ describe 'RuleList', ->
         profileName: 'ghi',
       })
       result.should.eql(rules)
+    it 'should parse geosite conditions with results', ->
+      list = '''
+        [SwitchyOmega Conditions]
+        @with result
+        geosite:cn +proxy
+        * +direct
+      '''
+      result = parse(list, 'ignored', 'alsoIgnored')
+      result.should.eql([{
+        source: 'geosite:cn'
+        condition:
+          conditionType: 'GeositeCondition'
+          pattern: 'cn'
+        profileName: 'proxy'
+      }, {
+        source: '*'
+        condition:
+          conditionType: 'HostWildcardCondition'
+          pattern: '*'
+        profileName: 'direct'
+      }])
     it 'should compose and parse exclusive conditions with results', ->
       rules = [{
         source: '!b.example.com'
