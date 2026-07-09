@@ -11,6 +11,14 @@ angular.module('omega').controller 'MasterCtrl', ($scope, $rootScope, $window,
   tr = $filter('tr')
 
   $rootScope.options = null
+  $scope.geositeInfo = {}
+  $scope.geositeUpdating = false
+
+  refreshGeositeInfo = ->
+    omegaTarget.getGeositeInfo?().then (info = {}) ->
+      $scope.geositeInfo = info
+
+  refreshGeositeInfo()
 
   omegaTarget.state('customCss').then (customCss = '') ->
     $scope.customCss = customCss
@@ -280,6 +288,25 @@ angular.module('omega').controller 'MasterCtrl', ($scope, $rootScope, $window,
           $scope.updatingProfile[name] = false
         else
           $scope.updatingProfile = {}
+    )
+
+  $rootScope.updateGeosite = ->
+    $rootScope.applyOptionsConfirm().then( ->
+      $scope.geositeUpdating = true
+      omegaTarget.updateGeosite(null, 'bypass_cache').then((info = {}) ->
+        $scope.geositeInfo = info
+        $rootScope.showAlert(
+          type: 'success'
+          i18n: 'options_geositeDownloadSuccess'
+        )
+      ).catch((err) ->
+        $rootScope.showAlert(
+          type: 'error'
+          message: err.message ? tr('options_geositeDownloadError')
+        )
+        refreshGeositeInfo()
+      ).finally ->
+        $scope.geositeUpdating = false
     )
 
   onOptionChange = (options, oldOptions) ->

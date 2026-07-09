@@ -510,6 +510,8 @@ class Options
         @reloadQuickSwitch()
       if changes['-downloadInterval']?
         @schedule 'updateProfile', @_options['-downloadInterval']
+      if changes['-geositeDownloadInterval']?
+        @schedule 'updateGeosite', @_options['-geositeDownloadInterval']
       if changes['-showInspectMenu']? or changes == @_options
         showMenu = @_options['-showInspectMenu']
         if not showMenu?

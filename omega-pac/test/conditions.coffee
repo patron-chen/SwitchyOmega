@@ -174,6 +174,56 @@ describe 'Conditions', ->
       testCond(cond, 'http://c.example.org/ghi', not 'match')
 
   describe 'GeositeCondition', ->
+    varint = (value) ->
+      out = []
+      while value >= 0x80
+        out.push((value & 0x7f) | 0x80)
+        value = Math.floor(value / 128)
+      out.push(value)
+      Buffer.from(out)
+
+    field = (fieldNo, wireType, payload) ->
+      Buffer.concat([varint(fieldNo * 8 + wireType), payload])
+
+    stringField = (fieldNo, value) ->
+      body = Buffer.from(value, 'utf8')
+      field(fieldNo, 2, Buffer.concat([varint(body.length), body]))
+
+    varintField = (fieldNo, value) ->
+      field(fieldNo, 0, varint(value))
+
+    messageField = (fieldNo, parts) ->
+      body = Buffer.concat(parts)
+      field(fieldNo, 2, Buffer.concat([varint(body.length), body]))
+
+    attr = (key) ->
+      messageField(3, [
+        stringField(1, key)
+        varintField(2, 1)
+      ])
+
+    domain = (type, value, attrs = []) ->
+      messageField(2, [
+        varintField(1, type)
+        stringField(2, value)
+      ].concat(attrs.map(attr)))
+
+    site = (code, domains) ->
+      messageField(1, [
+        stringField(1, code)
+      ].concat(domains))
+
+    it 'should build matcher data from geosite dat bytes', ->
+      fixture = Buffer.concat([
+        site('google', [
+          domain(2, 'google.com')
+          domain(3, 'analytics.google.com', ['ads'])
+        ])
+      ])
+      data = Geosite.buildData(fixture)
+      data.groups.google.domain.should.eql(['google.com'])
+      data.groups.google.attrs.ads.full.should.eql(['analytics.google.com'])
+
     it 'should parse geosite shorthand', ->
       Conditions.fromStr('geosite:cn').should.eql(
         conditionType: 'GeositeCondition'

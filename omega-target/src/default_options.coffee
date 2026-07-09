@@ -11,6 +11,9 @@ module.exports = ->
   "-showResultProfileOnActionBadgeText": false
   "-showExternalProfile": true
   "-downloadInterval": 1440
+  "-geositeUpdateUrl": "https://github.com/v2fly/domain-list-community" +
+    "/releases/latest/download/dlc.dat"
+  "-geositeDownloadInterval": 1440
   "+proxy":
     bypassList: [
       {

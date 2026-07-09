@@ -7,7 +7,12 @@ module.exports =
     files: [
       {
         cwd: 'build'
-        src: ['**', '!manifest.json', '!manifest-firefox.json']
+        src: [
+          '**',
+          '!manifest.json',
+          '!manifest-firefox.json',
+          '!js/omega_webext_proxy_script.min.js'
+        ]
         expand: true
         filter: 'isFile'
       }

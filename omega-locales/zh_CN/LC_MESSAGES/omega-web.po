@@ -383,6 +383,24 @@ msgstr "每天一次"
 msgid "options_downloadInterval_never"
 msgstr "从不更新"
 
+msgid "options_geositeUpdateUrl"
+msgstr "Geosite 数据地址"
+
+msgid "options_geositeUpdateUrlHelp"
+msgstr "下载 v2fly/domain-list-community 的 dlc.dat，并在本地重建 geosite 匹配数据。"
+
+msgid "options_geositeDownloadInterval"
+msgstr "Geosite 更新间隔"
+
+msgid "options_downloadGeositeNow"
+msgstr "立即更新 Geosite"
+
+msgid "options_geositeLastUpdate"
+msgstr "上次更新：$1。分组数：$2。"
+
+msgid "options_geositeLastError"
+msgstr "上次 Geosite 更新错误：$1"
+
 msgid "options_group_importExportProfile"
 msgstr "情景模式"
 
@@ -935,6 +953,12 @@ msgstr "下载备份文件时出错！"
 
 msgid "options_profileDownloadSuccess"
 msgstr "情景模式已经更新成功。"
+
+msgid "options_geositeDownloadSuccess"
+msgstr "Geosite 数据已经更新成功。"
+
+msgid "options_geositeDownloadError"
+msgstr "下载 Geosite 数据时出错！"
 
 msgid "options_profileDownloadError"
 msgstr "下载情景模式数据时出错！"

@@ -417,6 +417,24 @@ msgstr "Every day"
 msgid "options_downloadInterval_never"
 msgstr "Never"
 
+msgid "options_geositeUpdateUrl"
+msgstr "Geosite Data URL"
+
+msgid "options_geositeUpdateUrlHelp"
+msgstr "Download v2fly/domain-list-community dlc.dat and rebuild geosite matcher data locally."
+
+msgid "options_geositeDownloadInterval"
+msgstr "Geosite Update Interval"
+
+msgid "options_downloadGeositeNow"
+msgstr "Download Geosite Now"
+
+msgid "options_geositeLastUpdate"
+msgstr "Last updated: $1. Groups: $2."
+
+msgid "options_geositeLastError"
+msgstr "Last geosite update error: $1"
+
 msgid "options_group_importExportProfile"
 msgstr "Profile"
 
@@ -1099,6 +1117,12 @@ msgstr "Error downloading backup file!"
 
 msgid "options_profileDownloadSuccess"
 msgstr "Successfully updated profile."
+
+msgid "options_geositeDownloadSuccess"
+msgstr "Successfully updated geosite data."
+
+msgid "options_geositeDownloadError"
+msgstr "Error downloading geosite data!"
 
 msgid "options_profileDownloadError"
 msgstr "Error downloading profile data!"
