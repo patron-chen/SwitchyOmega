@@ -143,6 +143,10 @@ angular.module('omegaTarget', []).factory 'omegaTarget', ($q) ->
           results[key] = decodeError(value)
         results
       ).then omegaTarget.refresh
+    updateGeosite: (url, opt_bypass_cache) ->
+      callBackground('updateGeosite', url, opt_bypass_cache)
+    getGeositeInfo: ->
+      callBackground('getGeositeInfo')
     getMessage: chrome.i18n.getMessage.bind(chrome.i18n)
     openOptions: (hash) ->
       d = $q['defer']()

@@ -43,9 +43,17 @@ ZeroOmega can use v2fly/domain-list-community `geosite.dat` / `dlc.dat` data
 through generated PAC matcher data. The raw dat file is not required at
 extension runtime.
 
-Put `geosite.dat` under `geo/`, then generate the local data module:
+For local debugging or manual data seeding, put `geosite.dat` under `geo/`,
+then generate the data module:
 
     node tools/build-geosite.js
+
+Release packages do not include the generated data module. The Chromium
+extension can update this data online from Options > General >
+Download Options. By default it downloads the latest `dlc.dat` from
+v2fly/domain-list-community, decodes it locally, stores the compact matcher data
+in extension storage, and reapplies the current profile. The downloaded raw dat
+file is not stored in the extension package.
 
 After generation, Switch rules can use the `Geosite` condition with values like
 `cn`, `private`, `google@ads`, or `geolocation-!cn`. In a SwitchyOmega rule list,

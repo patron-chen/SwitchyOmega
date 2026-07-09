@@ -1,5 +1,6 @@
 module.exports =
   Conditions: require('./src/conditions')
+  Geosite: require('./src/geosite')
   PacGenerator: require('./src/pac_generator')
   Profiles: require('./src/profiles')
   RuleList: require('./src/rule_list')

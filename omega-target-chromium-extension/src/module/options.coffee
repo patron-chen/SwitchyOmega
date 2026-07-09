@@ -8,6 +8,23 @@ fetchUrl = require('./fetch_url')
 Url = require('url')
 
 TEMPPROFILEKEY = 'tempProfileState'
+GEOSITE_STORE = idbKeyval.createStore('geosite-store', 'geosite')
+GEOSITE_DATA_KEY = 'data'
+GEOSITE_META_KEY = 'meta'
+GEOSITE_DEFAULT_URL =
+  'https://github.com/v2fly/domain-list-community' +
+  '/releases/latest/download/dlc.dat'
+
+sha256ArrayBuffer = (buffer) ->
+  crypto.subtle.digest('SHA-256', buffer).then (hashBuffer) ->
+    hashArray = Array.from(new Uint8Array(hashBuffer))
+    hashArray.map((byte) -> byte.toString(16).padStart(2, '0')).join('')
+
+geositeError = (name, message, statusCode) ->
+  err = new Error(message)
+  err.name = name
+  err.statusCode = statusCode if statusCode?
+  err
 
 class ChromeOptions extends OmegaTarget.Options
   _inspect: null
@@ -59,6 +76,10 @@ class ChromeOptions extends OmegaTarget.Options
           @ready.then( =>
             @updateProfile()
           )
+        when 'omega.updateGeosite'
+          @ready.then( =>
+            @updateGeosite()
+          )
     chrome.contextMenus?.onClicked.addListener((info, tab) =>
       @ready.then( =>
         switch info.menuItemId
@@ -103,6 +124,12 @@ class ChromeOptions extends OmegaTarget.Options
   init: (startupCheck) ->
     super(startupCheck)
     @ready.then =>
+      @loadGeositeData().then((info) =>
+        if @_options['-geositeDownloadInterval'] > 0 and not info?.lastUpdate
+          @updateGeosite()
+      ).catch((err) ->
+        console.error('failed to initialize geosite data', err)
+      )
       chrome.storage.session
       .get(TEMPPROFILEKEY).then((tempProfileState = {}) =>
         tempProfileState = tempProfileState[TEMPPROFILEKEY]
@@ -155,6 +182,72 @@ class ChromeOptions extends OmegaTarget.Options
         )
         ###
       return results
+
+  getGeositeInfo: ->
+    idbKeyval.get(GEOSITE_META_KEY, GEOSITE_STORE).then((meta = {}) =>
+      meta.url ?= @_options['-geositeUpdateUrl'] ? GEOSITE_DEFAULT_URL
+      meta
+    )
+
+  loadGeositeData: ->
+    Promise.all([
+      idbKeyval.get(GEOSITE_DATA_KEY, GEOSITE_STORE)
+      idbKeyval.get(GEOSITE_META_KEY, GEOSITE_STORE)
+    ]).then(([data, meta]) ->
+      OmegaPac.Geosite.setData(data) if data?.groups
+      meta ? {}
+    )
+
+  updateGeosite: (url, opt_bypass_cache) ->
+    url ?= @_options['-geositeUpdateUrl'] ? GEOSITE_DEFAULT_URL
+    fetchOptions = {}
+    fetchOptions.cache = 'reload' if opt_bypass_cache
+    startedAt = new Date().toISOString()
+    fetch(url, fetchOptions).then((response) ->
+      unless response.ok
+        throw geositeError('HttpError',
+          'HTTP ' + response.status + ' while updating geosite data',
+          response.status)
+      response.arrayBuffer()
+    ).then((arrayBuffer) =>
+      data = OmegaPac.Geosite.buildData(arrayBuffer)
+      groupCount = Object.keys(data.groups ? {}).length
+      unless groupCount
+        throw geositeError('GeositeDataError', 'No geosite groups decoded')
+      sha256ArrayBuffer(arrayBuffer).then((sha256) =>
+        meta =
+          url: url
+          lastUpdate: new Date().toISOString()
+          startedAt: startedAt
+          sha256: sha256
+          groupCount: groupCount
+          error: null
+        idbKeyval.set(GEOSITE_DATA_KEY, data, GEOSITE_STORE).then(->
+          idbKeyval.set(GEOSITE_META_KEY, meta, GEOSITE_STORE)
+        ).then(=>
+          OmegaPac.Geosite.setData(data)
+          OmegaPac.Profiles.each @_options, (key, profile) ->
+            OmegaPac.Profiles.dropCache(profile)
+          OmegaPac.Profiles.dropCache(@_tempProfile) if @_tempProfile?
+          if @_currentProfileName
+            options = {update: false, reason: 'geosite'}
+            @applyProfile(@_currentProfileName, options).return(meta)
+          else
+            meta
+        )
+      )
+    ).catch((err) ->
+      idbKeyval.get(GEOSITE_META_KEY, GEOSITE_STORE).then((meta = {}) ->
+        meta.url = url
+        meta.lastError = new Date().toISOString()
+        meta.error =
+          name: err.name ? 'Error'
+          message: err.message ? String(err)
+          statusCode: err.statusCode
+        idbKeyval.set(GEOSITE_META_KEY, meta, GEOSITE_STORE).then ->
+          throw err
+      )
+    )
 
   _proxyNotControllable: null
   proxyNotControllable: -> @_proxyNotControllable
