@@ -8,6 +8,37 @@ angular.module('omega').controller 'MasterCtrl', ($scope, $rootScope, $window,
     $scope.isExperimental = true
     $scope.pacProfilesUnsupported = true
 
+  $scope.proxyEnvironmentSupported = not (
+    browser?.proxy?.register? or browser?.proxy?.registerProxyScript?)
+  $scope.proxyEnvironmentTimezones = ['Etc/GMT']
+  try
+    for timezone in Intl.supportedValuesOf('timeZone')
+      unless timezone in $scope.proxyEnvironmentTimezones
+        $scope.proxyEnvironmentTimezones.push(timezone)
+  catch _
+    null
+
+  $scope.validateProxyEnvironmentTimezone = (timezone) ->
+    return false unless timezone
+    try
+      new Intl.DateTimeFormat('en', {timeZone: timezone})
+      true
+    catch _
+      false
+
+  $scope.validateProxyEnvironmentLanguage = (language) ->
+    return false unless language
+    try
+      Intl.getCanonicalLocales(language).length == 1
+    catch _
+      false
+
+  $scope.normalizeProxyEnvironmentLanguage = ->
+    key = '-proxyEnvironmentLanguage'
+    language = $rootScope.options?[key]
+    return unless $scope.validateProxyEnvironmentLanguage(language)
+    $rootScope.options[key] = Intl.getCanonicalLocales(language)[0]
+
   tr = $filter('tr')
 
   $rootScope.options = null

@@ -7,6 +7,7 @@ module.exports =
   ExternalApi: require('./external_api')
   WebRequestMonitor: require('./web_request_monitor')
   Inspect: require('./inspect')
+  ProxyEnvironmentManager: require('./proxy_environment')
   Url: require('url')
   proxy: require('./proxy')
 

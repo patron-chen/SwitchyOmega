@@ -5,3 +5,4 @@ package-lock.json
 *.swp
 geo/*.dat
 geo/*.metadb
+dist

@@ -15,6 +15,7 @@ startupCheck = ->
   , 2000)
   return globalThis.isBrowserRestart
 options = null
+proxyEnvironment = null
 
 chrome.runtime.onStartup.addListener ->
   globalThis.isBrowserRestart = true
@@ -250,6 +251,10 @@ zeroBackground = (zeroStorage, opts) ->
 
   options.initWithOptions(null, startupCheck)
 
+  proxyEnvironment = new OmegaTargetCurrent.ProxyEnvironmentManager(
+    options, Log)
+  proxyEnvironment.init()
+
   options.externalApi = new OmegaTargetCurrent.ExternalApi(options)
   options.externalApi.listen()
 
@@ -420,6 +425,7 @@ zeroBackground = (zeroStorage, opts) ->
       title: title
       shortTitle: shortTitle
     )
+    proxyEnvironment?.scheduleRefreshAll()
 
   encodeError = (obj) ->
     if obj instanceof Error
@@ -457,6 +463,16 @@ zeroBackground = (zeroStorage, opts) ->
       ])
   chrome.runtime.onMessage.addListener (request, sender, respond) ->
     return unless request and request.method
+
+    if request.method == 'getProxyEnvironment'
+      details = request.args?[0] ? {}
+      proxyEnvironment.getForSender(sender, details).then (result) ->
+        respond(result: result)
+      .catch (error) ->
+        Log.error(request.method + ' ==>', error)
+        respond(error: encodeError(error))
+      return true
+
     options.ready.then ->
       if request.method == 'resetAllOptions'
         target = globalThis

@@ -20,6 +20,19 @@ or grab a packaged extension file (CRX) for offline installation on the [Release
 
 Please [report issues on the issue tracker](https://github.com/zero-peak/ZeroOmega/issues).
 
+### Proxy environment spoofing
+
+Chromium users can enable **Proxy Environment Spoofing** under
+Options > General. The configured IANA time zone and BCP 47 language are
+applied only when the document URL explicitly matches an existing rule whose
+final profile is neither Direct nor System. Default-profile fallbacks do not
+enable spoofing. This feature changes page JavaScript APIs only and does not
+change the network `Accept-Language` header. It requires Chrome 119 or later.
+The shims remain installed in passthrough mode on non-matching pages, so deep
+anti-tampering checks can still detect wrapped constructors. Chrome also does
+not guarantee that navigation events run before the page's first synchronous
+inline script.
+
 Firefox Addon
 ----------------------------
 

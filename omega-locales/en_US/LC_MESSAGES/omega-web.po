@@ -387,6 +387,27 @@ msgid "options_monitorWebRequestsHelp"
 msgstr "A yellow badge will be displayed on the icon if some resources fail to load,<br>"
 "and you can set the profile for such resources conveniently via the popup menu."
 
+msgid "options_group_proxyEnvironment"
+msgstr "Proxy Environment Spoofing"
+
+msgid "options_proxyEnvironmentEnabled"
+msgstr "Spoof the time zone and language on pages explicitly matched to a proxy profile."
+
+msgid "options_proxyEnvironmentHelp"
+msgstr "Pages using the default rule, Direct, or System profiles keep the browser's native environment. Network Accept-Language is not changed."
+
+msgid "options_proxyEnvironmentTimezone"
+msgstr "IANA time zone"
+
+msgid "options_proxyEnvironmentTimezoneHelp"
+msgstr "Enter a valid IANA time zone, for example Etc/GMT or America/New_York."
+
+msgid "options_proxyEnvironmentLanguage"
+msgstr "Language"
+
+msgid "options_proxyEnvironmentLanguageHelp"
+msgstr "Enter a valid BCP 47 language tag, for example en-US."
+
 msgid "options_downloadOptions"
 msgstr "Download Options"
 
