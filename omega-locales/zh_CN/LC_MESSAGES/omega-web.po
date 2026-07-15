@@ -353,6 +353,27 @@ msgid "options_monitorWebRequestsHelp"
 msgstr "启用此选项后，如有资源加载失败，则图标上会显示数字提示。<br>"
 "此时，您可以通过弹出菜单一次设置这些资源使用的情景模式，操作十分便捷。"
 
+msgid "options_group_proxyEnvironment"
+msgstr "代理环境伪装"
+
+msgid "options_proxyEnvironmentEnabled"
+msgstr "对显式匹配到代理情景模式的页面伪装时区和语言。"
+
+msgid "options_proxyEnvironmentHelp"
+msgstr "仅使用默认规则、Direct 或 System 情景模式的页面保持浏览器原生环境；不会修改网络请求的 Accept-Language。"
+
+msgid "options_proxyEnvironmentTimezone"
+msgstr "IANA 时区"
+
+msgid "options_proxyEnvironmentTimezoneHelp"
+msgstr "请输入有效的 IANA 时区，例如 Etc/GMT 或 America/New_York。"
+
+msgid "options_proxyEnvironmentLanguage"
+msgstr "语言"
+
+msgid "options_proxyEnvironmentLanguageHelp"
+msgstr "请输入有效的 BCP 47 语言标签，例如 en-US。"
+
 msgid "options_downloadOptions"
 msgstr "下载选项"
 

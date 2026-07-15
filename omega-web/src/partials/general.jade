@@ -36,6 +36,34 @@ section.settings-group.width-limit
       | {{'options_geositeLastUpdate' | tr:[geositeInfo.lastUpdate, geositeInfo.groupCount || 0]}}
     p.help-block.text-danger(ng-if='geositeInfo.error')
       | {{'options_geositeLastError' | tr:[geositeInfo.error.message || geositeInfo.error.name]}}
+section.settings-group.width-limit(ng-if='proxyEnvironmentSupported')
+  h3 {{'options_group_proxyEnvironment' | tr}}
+  .checkbox
+    label
+      input#proxy-environment-enabled(type='checkbox'
+        ng-model='options["-proxyEnvironmentEnabled"]')
+      span {{'options_proxyEnvironmentEnabled' | tr}}
+    p.help-block {{'options_proxyEnvironmentHelp' | tr}}
+  .form-group
+    label(for='proxy-environment-timezone')
+      | {{'options_proxyEnvironmentTimezone' | tr}}
+    input#proxy-environment-timezone.form-control(type='text'
+      list='proxy-environment-timezones'
+      ng-model='options["-proxyEnvironmentTimezone"]'
+      ng-disabled='!options["-proxyEnvironmentEnabled"]' required
+      ui-validate='{timezone: "validateProxyEnvironmentTimezone($value)"}')
+    datalist#proxy-environment-timezones
+      option(ng-repeat='timezone in proxyEnvironmentTimezones' value='{{timezone}}')
+    p.help-block {{'options_proxyEnvironmentTimezoneHelp' | tr}}
+  .form-group
+    label(for='proxy-environment-language')
+      | {{'options_proxyEnvironmentLanguage' | tr}}
+    input#proxy-environment-language.form-control(type='text'
+      ng-model='options["-proxyEnvironmentLanguage"]'
+      ng-disabled='!options["-proxyEnvironmentEnabled"]' required
+      ng-blur='normalizeProxyEnvironmentLanguage()'
+      ui-validate='{language: "validateProxyEnvironmentLanguage($value)"}')
+    p.help-block {{'options_proxyEnvironmentLanguageHelp' | tr}}
 section.settings-group.width-limit
   h3 {{'options_group_conflicts' | tr}}
   p {{'options_conflicts_introduction' | tr}}

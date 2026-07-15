@@ -8,6 +8,9 @@ module.exports = ->
   "-confirmDeletion": true
   "-showInspectMenu": true
   "-addConditionsToBottom": false
+  "-proxyEnvironmentEnabled": false
+  "-proxyEnvironmentTimezone": "Etc/GMT"
+  "-proxyEnvironmentLanguage": "en-US"
   "-showResultProfileOnActionBadgeText": false
   "-showExternalProfile": true
   "-downloadInterval": 1440
