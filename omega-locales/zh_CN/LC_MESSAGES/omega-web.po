@@ -357,10 +357,10 @@ msgid "options_group_proxyEnvironment"
 msgstr "代理环境伪装"
 
 msgid "options_proxyEnvironmentEnabled"
-msgstr "对显式匹配到代理情景模式的页面伪装时区和语言。"
+msgstr "在手动代理模式下，或页面显式匹配到代理情景模式时，伪装时区和语言。"
 
 msgid "options_proxyEnvironmentHelp"
-msgstr "仅使用默认规则、Direct 或 System 情景模式的页面保持浏览器原生环境；不会修改网络请求的 Accept-Language。"
+msgstr "伪装生效时，Chromium 也会同步当前标签页网络请求的 Accept-Language；默认规则、Direct 和 System 页面保持浏览器原生环境。"
 
 msgid "options_proxyEnvironmentTimezone"
 msgstr "IANA 时区"

@@ -65,3 +65,25 @@ describe 'ProxyEnvironmentManager', ->
       profile: {name: 'switch', profileType: 'SwitchProfile'}
       results: [explicit('switch'), ['+missing', null]]
     expect(Match.shouldEnableForMatch(match)).to.equal(false)
+
+  it 'builds an Accept-Language value from the configured locale', ->
+    expect(Match.languageHeaderValue('en-US')).to.equal('en-US,en;q=0.9')
+    expect(Match.languageHeaderValue('zh-CN')).to.equal('zh-CN,zh;q=0.9')
+    expect(Match.languageHeaderValue('de')).to.equal('de')
+
+  it 'builds a tab-scoped session header rule', ->
+    rule = Match.buildLanguageHeaderRule(1500000000, 42, 'en-US')
+    expect(rule.action.type).to.equal('modifyHeaders')
+    expect(rule.action.requestHeaders[0]).to.deep.equal({
+      header: 'Accept-Language'
+      operation: 'set'
+      value: 'en-US,en;q=0.9'
+    })
+    expect(rule.condition.tabIds).to.deep.equal([42])
+    expect(rule.condition.urlFilter).to.equal('|http')
+
+  it 'builds a global session header rule for manual proxy mode', ->
+    rule = Match.buildLanguageHeaderRule(1499999999, null, 'zh-CN')
+    expect(rule.condition.tabIds).to.equal(undefined)
+    expect(rule.condition.urlFilter).to.equal('|http')
+    expect(rule.action.requestHeaders[0].value).to.equal('zh-CN,zh;q=0.9')
