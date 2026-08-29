@@ -32,10 +32,34 @@ shouldEnableForMatch = (match, activeProfile) ->
   return false unless isResolvedMatch(match) and isProxyProfile(match?.profile)
   hasExplicitRuleMatch(match?.results) or isManualProxyProfile(activeProfile)
 
+languageHeaderValue = (language) ->
+  return '' unless typeof language == 'string' and language.length
+  base = language.split('-')[0]
+  return language if base.toLowerCase() == language.toLowerCase()
+  language + ',' + base + ';q=0.9'
+
+buildLanguageHeaderRule = (id, tabId, language) ->
+  condition = {urlFilter: '|http'}
+  condition.tabIds = [tabId] if tabId?
+  {
+    id: id
+    priority: 1
+    action:
+      type: 'modifyHeaders'
+      requestHeaders: [{
+        header: 'Accept-Language'
+        operation: 'set'
+        value: languageHeaderValue(language)
+      }]
+    condition: condition
+  }
+
 module.exports = {
   hasExplicitRuleMatch
   isProxyProfile
   isManualProxyProfile
   isResolvedMatch
   shouldEnableForMatch
+  languageHeaderValue
+  buildLanguageHeaderRule
 }

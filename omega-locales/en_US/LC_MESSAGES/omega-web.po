@@ -391,10 +391,10 @@ msgid "options_group_proxyEnvironment"
 msgstr "Proxy Environment Spoofing"
 
 msgid "options_proxyEnvironmentEnabled"
-msgstr "Spoof the time zone and language on pages explicitly matched to a proxy profile."
+msgstr "Spoof the time zone and language in manual proxy mode or on pages explicitly matched to a proxy profile."
 
 msgid "options_proxyEnvironmentHelp"
-msgstr "Pages using the default rule, Direct, or System profiles keep the browser's native environment. Network Accept-Language is not changed."
+msgstr "When spoofing is active, Chromium also aligns the tab's network Accept-Language header. Default-rule, Direct, and System pages keep the browser's native environment."
 
 msgid "options_proxyEnvironmentTimezone"
 msgstr "IANA time zone"

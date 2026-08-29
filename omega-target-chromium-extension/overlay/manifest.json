@@ -43,6 +43,7 @@
     "storage",
     "scripting",
     "webNavigation",
+    "declarativeNetRequestWithHostAccess",
     "unlimitedStorage",
     "webRequest",
     "webRequestAuthProvider",
