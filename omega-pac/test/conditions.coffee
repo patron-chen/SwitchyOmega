@@ -21,6 +21,11 @@ describe 'Conditions', ->
               regexp: []
               domain: []
               full: ['analytics.google.com']
+            tracking:
+              plain: []
+              regexp: []
+              domain: []
+              full: ['analytics.google.com']
         cn:
           plain: []
           regexp: []
@@ -259,6 +264,14 @@ describe 'Conditions', ->
         pattern: 'google@ads'
       testCond(cond, 'https://analytics.google.com/', 'match')
       testCond(cond, 'https://google.com/', not 'match')
+    it 'should match normalized and combined attributes in pac output', ->
+      cond =
+        conditionType: 'GeositeCondition'
+        pattern: 'google@+ads'
+      testCond(cond, 'https://analytics.google.com/', 'match')
+      cond.pattern = 'google@ads@tracking'
+      testCond(cond, 'https://analytics.google.com/', 'match')
+      testCond(cond, 'https://google.com/', not 'match')
 
   describe 'BypassCondition', ->
     # See https://developer.chrome.com/extensions/proxy#bypass_list
@@ -490,7 +503,7 @@ describe 'Conditions', ->
       # 07 08 09 10 11 12 13
       # (...)
       date = if day > 0 then day else 7
-      clock.setSystemTime(new Date("2016-02-0#{date}T00:00:00Z").getTime())
+      clock.setSystemTime(new Date(2016, 1, date).getTime())
       testCond(cond, "http://weekday-#{day}/", match)
 
     it 'should match requests based on date range', ->
