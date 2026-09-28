@@ -28,6 +28,10 @@ $script('../js/omega_target_popup.js', 'om-target', function() {
       'externalProfile',
       'showExternalProfile',
       'customCss',
+      'proxyEnvironmentSupported',
+      'proxyEnvironmentEnabled',
+      'proxyEnvironmentProfiles',
+      'proxyEnvironmentActiveProfileId',
     ], function(err, state) {
       window.OmegaPopup.state = state;
       $script.done('om-state');

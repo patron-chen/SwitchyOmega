@@ -36,7 +36,7 @@ section.settings-group.width-limit
       | {{'options_geositeLastUpdate' | tr:[geositeInfo.lastUpdate, geositeInfo.groupCount || 0]}}
     p.help-block.text-danger(ng-if='geositeInfo.error')
       | {{'options_geositeLastError' | tr:[geositeInfo.error.message || geositeInfo.error.name]}}
-section.settings-group.width-limit(ng-if='proxyEnvironmentSupported')
+section.settings-group.width-limit-xl(ng-if='proxyEnvironmentSupported')
   h3 {{'options_group_proxyEnvironment' | tr}}
   .checkbox
     label
@@ -44,26 +44,49 @@ section.settings-group.width-limit(ng-if='proxyEnvironmentSupported')
         ng-model='options["-proxyEnvironmentEnabled"]')
       span {{'options_proxyEnvironmentEnabled' | tr}}
     p.help-block {{'options_proxyEnvironmentHelp' | tr}}
-  .form-group
-    label(for='proxy-environment-timezone')
-      | {{'options_proxyEnvironmentTimezone' | tr}}
-    input#proxy-environment-timezone.form-control(type='text'
-      list='proxy-environment-timezones'
-      ng-model='options["-proxyEnvironmentTimezone"]'
-      ng-disabled='!options["-proxyEnvironmentEnabled"]' required
-      ui-validate='{timezone: "validateProxyEnvironmentTimezone($value)"}')
-    datalist#proxy-environment-timezones
-      option(ng-repeat='timezone in proxyEnvironmentTimezones' value='{{timezone}}')
-    p.help-block {{'options_proxyEnvironmentTimezoneHelp' | tr}}
-  .form-group
-    label(for='proxy-environment-language')
-      | {{'options_proxyEnvironmentLanguage' | tr}}
-    input#proxy-environment-language.form-control(type='text'
-      ng-model='options["-proxyEnvironmentLanguage"]'
-      ng-disabled='!options["-proxyEnvironmentEnabled"]' required
-      ng-blur='normalizeProxyEnvironmentLanguage()'
-      ui-validate='{language: "validateProxyEnvironmentLanguage($value)"}')
-    p.help-block {{'options_proxyEnvironmentLanguageHelp' | tr}}
+  p.help-block {{'options_proxyEnvironmentProfilesHelp' | tr}}
+  .table-responsive
+    table.table.table-bordered.table-condensed.proxy-environment-profiles
+      thead
+        tr
+          th.proxy-environment-current {{'options_proxyEnvironmentCurrent' | tr}}
+          th {{'options_proxyEnvironmentProfileName' | tr}}
+          th {{'options_proxyEnvironmentTimezone' | tr}}
+          th {{'options_proxyEnvironmentLanguage' | tr}}
+          th.proxy-environment-actions
+      tbody
+        tr(ng-repeat='profile in options["-proxyEnvironmentProfiles"] track by profile.id')
+          td.proxy-environment-current
+            input(type='radio' name='proxyEnvironmentActiveProfile'
+              ng-model='options["-proxyEnvironmentActiveProfileId"]'
+              ng-value='profile.id' ng-change='syncProxyEnvironmentProfile()'
+              title='{{"options_proxyEnvironmentCurrent" | tr}}')
+          td
+            input.form-control(type='text' ng-model='profile.name' required
+              data-proxy-environment-name='{{profile.id}}'
+              ui-validate='{unique: "validateProxyEnvironmentName($value, profile.id)"}')
+          td
+            input.form-control(type='text' list='proxy-environment-timezones'
+              ng-model='profile.timezone' required
+              ui-validate='{timezone: "validateProxyEnvironmentTimezone($value)"}')
+          td
+            input.form-control(type='text' ng-model='profile.language' required
+              ng-blur='normalizeProxyEnvironmentLanguage(profile)'
+              ui-validate='{language: "validateProxyEnvironmentLanguage($value)"}')
+          td.proxy-environment-actions
+            button.btn.btn-danger.btn-sm(type='button'
+              ng-click='removeProxyEnvironmentProfile(profile.id)'
+              ng-disabled='options["-proxyEnvironmentProfiles"].length <= 1'
+              title='{{"options_proxyEnvironmentDelete" | tr}}')
+              span.glyphicon.glyphicon-trash
+  datalist#proxy-environment-timezones
+    option(ng-repeat='timezone in proxyEnvironmentTimezones' value='{{timezone}}')
+  button.btn.btn-default(type='button' ng-click='addProxyEnvironmentProfile()')
+    span.glyphicon.glyphicon-plus
+    = ' '
+    | {{'options_proxyEnvironmentAdd' | tr}}
+  p.help-block {{'options_proxyEnvironmentTimezoneHelp' | tr}}
+  p.help-block {{'options_proxyEnvironmentLanguageHelp' | tr}}
 section.settings-group.width-limit
   h3 {{'options_group_conflicts' | tr}}
   p {{'options_conflicts_introduction' | tr}}

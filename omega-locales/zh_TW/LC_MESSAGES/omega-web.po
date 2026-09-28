@@ -1157,3 +1157,24 @@ msgstr "ZeroOmega 的誕生離不開 <a href='https://github.com/FelisCatus/Swit
 
 msgid "about_license"
 msgstr "ZeroOmega 是<a href='https://www.gnu.org/philosophy/free-sw.zh-tw.html'>自由軟體</a>，使用<a href='https://www.gnu.org/licenses/gpl.html'>GNU General Public License</a> 版本 3 及以上授權。"
+
+msgid "options_proxyEnvironmentProfilesHelp"
+msgstr "Create named environment presets and choose which preset is currently active."
+
+msgid "options_proxyEnvironmentProfileName"
+msgstr "Preset name"
+
+msgid "options_proxyEnvironmentCurrent"
+msgstr "Current"
+
+msgid "options_proxyEnvironmentAdd"
+msgstr "Add preset"
+
+msgid "options_proxyEnvironmentDelete"
+msgstr "Delete preset"
+
+msgid "popup_proxyEnvironment"
+msgstr "Environment"
+
+msgid "popup_proxyEnvironmentDisabled"
+msgstr "off"

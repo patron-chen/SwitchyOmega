@@ -1286,3 +1286,24 @@ msgstr "ZeroOmega is made possible by the <a href='https://github.com/FelisCatus
 
 msgid "about_license"
 msgstr "ZeroOmega is <a href='https://www.gnu.org/philosophy/free-sw.en.html'>free software</a> licensed under <a href='https://www.gnu.org/licenses/gpl.html'>GNU General Public License</a> Version 3 or later."
+
+msgid "options_proxyEnvironmentProfilesHelp"
+msgstr "Create named environment presets and choose which preset is currently active."
+
+msgid "options_proxyEnvironmentProfileName"
+msgstr "Preset name"
+
+msgid "options_proxyEnvironmentCurrent"
+msgstr "Current"
+
+msgid "options_proxyEnvironmentAdd"
+msgstr "Add preset"
+
+msgid "options_proxyEnvironmentDelete"
+msgstr "Delete preset"
+
+msgid "popup_proxyEnvironment"
+msgstr "Environment"
+
+msgid "popup_proxyEnvironmentDisabled"
+msgstr "off"

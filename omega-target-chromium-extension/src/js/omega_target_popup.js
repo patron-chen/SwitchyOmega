@@ -36,6 +36,9 @@ OmegaTargetPopup = {
   applyProfile: function (name, cb) {
     callBackgroundNoReply('applyProfile', [name], cb);
   },
+  selectProxyEnvironmentProfile: function (id, cb) {
+    callBackgroundNoReply('selectProxyEnvironmentProfile', [id], cb);
+  },
   openOptions: function (hash, cb) {
     var options_url = chrome.runtime.getURL('options.html');
     console.log('open options.....')

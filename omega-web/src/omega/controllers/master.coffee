@@ -33,11 +33,82 @@ angular.module('omega').controller 'MasterCtrl', ($scope, $rootScope, $window,
     catch _
       false
 
-  $scope.normalizeProxyEnvironmentLanguage = ->
-    key = '-proxyEnvironmentLanguage'
-    language = $rootScope.options?[key]
+  $scope.normalizeProxyEnvironmentLanguage = (profile) ->
+    language = profile?.language
     return unless $scope.validateProxyEnvironmentLanguage(language)
-    $rootScope.options[key] = Intl.getCanonicalLocales(language)[0]
+    profile.language = Intl.getCanonicalLocales(language)[0]
+    $scope.syncProxyEnvironmentProfile()
+
+  $scope.validateProxyEnvironmentName = (name, id) ->
+    return true unless name
+    normalized = name.trim().toLowerCase()
+    profiles = $rootScope.options?['-proxyEnvironmentProfiles'] ? []
+    for profile in profiles when profile.id != id
+      return false if profile.name?.trim().toLowerCase() == normalized
+    true
+
+  $scope.syncProxyEnvironmentProfile = ->
+    options = $rootScope.options
+    return unless options
+    profiles = options['-proxyEnvironmentProfiles'] ? []
+    activeId = options['-proxyEnvironmentActiveProfileId']
+    active = null
+    for profile in profiles when profile.id == activeId
+      active = profile
+      break
+    active ?= profiles[0]
+    return unless active
+    options['-proxyEnvironmentActiveProfileId'] = active.id
+    options['-proxyEnvironmentTimezone'] = active.timezone
+    options['-proxyEnvironmentLanguage'] = active.language
+
+  proxyEnvironmentId = 0
+  $scope.addProxyEnvironmentProfile = ->
+    options = $rootScope.options
+    profiles = options['-proxyEnvironmentProfiles']
+    activeId = options['-proxyEnvironmentActiveProfileId']
+    source = null
+    for profile in profiles when profile.id == activeId
+      source = profile
+      break
+    source ?= profiles[0]
+
+    id = null
+    while not id
+      proxyEnvironmentId++
+      candidate = 'environment-' + Date.now().toString(36) + '-' +
+        proxyEnvironmentId
+      id = candidate unless profiles.some((profile) -> profile.id == candidate)
+
+    profiles.push({
+      id: id
+      name: ''
+      timezone: source?.timezone ? 'Etc/GMT'
+      language: source?.language ? 'en-US'
+    })
+    $timeout ->
+      document.querySelector(
+        '[data-proxy-environment-name="' + id + '"]')?.focus()
+
+  $scope.removeProxyEnvironmentProfile = (id) ->
+    options = $rootScope.options
+    profiles = options['-proxyEnvironmentProfiles']
+    return if profiles.length <= 1
+    index = -1
+    for profile, profileIndex in profiles when profile.id == id
+      index = profileIndex
+      break
+    return if index < 0
+    removingActive = options['-proxyEnvironmentActiveProfileId'] == id
+    profiles.splice(index, 1)
+    if removingActive
+      options['-proxyEnvironmentActiveProfileId'] =
+        profiles[Math.min(index, profiles.length - 1)].id
+    $scope.syncProxyEnvironmentProfile()
+
+  $scope.$watch 'options["-proxyEnvironmentProfiles"]', (profiles) ->
+    $scope.syncProxyEnvironmentProfile() if profiles
+  , true
 
   tr = $filter('tr')
 

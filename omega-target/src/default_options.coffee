@@ -9,6 +9,15 @@ module.exports = ->
   "-showInspectMenu": true
   "-addConditionsToBottom": false
   "-proxyEnvironmentEnabled": false
+  "-proxyEnvironmentProfiles": [
+    {
+      id: "default"
+      name: "en-US · Etc/GMT"
+      timezone: "Etc/GMT"
+      language: "en-US"
+    }
+  ]
+  "-proxyEnvironmentActiveProfileId": "default"
   "-proxyEnvironmentTimezone": "Etc/GMT"
   "-proxyEnvironmentLanguage": "en-US"
   "-showResultProfileOnActionBadgeText": false

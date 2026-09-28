@@ -374,6 +374,27 @@ msgstr "语言"
 msgid "options_proxyEnvironmentLanguageHelp"
 msgstr "请输入有效的 BCP 47 语言标签，例如 en-US。"
 
+msgid "options_proxyEnvironmentProfilesHelp"
+msgstr "创建多套命名环境预设，并选择当前使用的预设。"
+
+msgid "options_proxyEnvironmentProfileName"
+msgstr "预设名称"
+
+msgid "options_proxyEnvironmentCurrent"
+msgstr "当前"
+
+msgid "options_proxyEnvironmentAdd"
+msgstr "添加预设"
+
+msgid "options_proxyEnvironmentDelete"
+msgstr "删除预设"
+
+msgid "popup_proxyEnvironment"
+msgstr "环境伪装"
+
+msgid "popup_proxyEnvironmentDisabled"
+msgstr "已关闭"
+
 msgid "options_downloadOptions"
 msgstr "下载选项"
 

@@ -10,6 +10,8 @@ ENVIRONMENT_OPTION_KEYS = [
   '-proxyEnvironmentEnabled'
   '-proxyEnvironmentTimezone'
   '-proxyEnvironmentLanguage'
+  '-proxyEnvironmentProfiles'
+  '-proxyEnvironmentActiveProfileId'
 ]
 GLOBAL_HEADER_RULE_ID = 1499999999
 HEADER_RULE_ID_MIN = 1500000000

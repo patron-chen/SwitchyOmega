@@ -35,6 +35,7 @@
       return;
     }
     addProfilesItems(state);
+    addProxyEnvironmentItem(state);
     $script.done('om-profile-items');
     updateOtherItems(state);
   }
@@ -221,6 +222,65 @@
       icon.classList.add('om-virtual-profile-icon');
     }
     return profileDisp;
+  }
+
+  function addProxyEnvironmentItem(state) {
+    var profiles = state.proxyEnvironmentProfiles || [];
+    if (!state.proxyEnvironmentSupported || !profiles.length) return;
+
+    var current = profiles[0];
+    profiles.forEach(function(profile) {
+      if (profile.id === state.proxyEnvironmentActiveProfileId) {
+        current = profile;
+      }
+    });
+
+    var item = document.getElementById('js-proxy-environment');
+    var divider = document.getElementById('js-proxy-environment-end');
+    var label = OmegaTargetPopup.getMessage('popup_proxyEnvironment') ||
+      'Environment';
+    var disabled = OmegaTargetPopup.getMessage(
+      'popup_proxyEnvironmentDisabled') || 'off';
+    var text = label + ': ' + current.name;
+    if (!state.proxyEnvironmentEnabled) text += ' (' + disabled + ')';
+    item.querySelector('.om-proxy-environment-name').textContent = text;
+    item.title = current.timezone + ' · ' + current.language;
+    item.querySelector('.glyphicon').style.color =
+      state.proxyEnvironmentEnabled ? '#5bc0de' : '#aaa';
+    item.classList.remove('om-hidden');
+    divider.classList.remove('om-hidden');
+
+    OmegaPopup.showProxyEnvironmentDropdown = function() {
+      toggleDropdown(item, createProxyEnvironmentDropdown);
+      document.getElementById('js-proxy-environment-toggle').focus();
+    };
+    $script.done('om-proxy-environment-dropdown');
+  }
+
+  function createProxyEnvironmentDropdown() {
+    var ul = document.createElement('ul');
+    var state = OmegaPopup.state;
+    state.proxyEnvironmentProfiles.forEach(function(profile) {
+      var li = profileTemplate.cloneNode(true);
+      var link = li.querySelector('a');
+      link.removeAttribute('id');
+      li.querySelector('.om-profile-name').textContent = profile.name;
+      li.title = profile.timezone + ' · ' + profile.language;
+      li.querySelector('.glyphicon').setAttribute(
+        'class', 'glyphicon glyphicon-globe');
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        $script.ready('om-main', function() {
+          OmegaPopup.selectProxyEnvironmentProfile(profile.id);
+        });
+      });
+      if (profile.id === state.proxyEnvironmentActiveProfileId) {
+        li.classList.add(state.proxyEnvironmentEnabled ?
+          'om-active' : 'om-effective');
+      }
+      ul.appendChild(li);
+    });
+    return ul;
   }
 
   function toggleDropdown(container, createDropdown) {

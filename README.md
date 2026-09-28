@@ -23,8 +23,12 @@ Please [report issues on the issue tracker](https://github.com/zero-peak/ZeroOme
 ### Proxy environment spoofing
 
 Chromium users can enable **Proxy Environment Spoofing** under
-Options > General. The configured IANA time zone and BCP 47 language are
-applied in manual proxy profiles or when the document URL explicitly matches
+Options > General. Multiple named presets can be configured, each with an
+IANA time zone and BCP 47 language. The active preset can be switched from
+the toolbar popup; choosing a preset enables spoofing and reloads the active
+page so early page scripts and request headers use the new environment.
+The active preset is applied in manual proxy profiles or when the document URL
+explicitly matches
 an existing rule whose final profile is neither Direct nor System.
 Default-profile fallbacks do not enable spoofing. Chromium also aligns
 the network `Accept-Language` request header with the configured language. It

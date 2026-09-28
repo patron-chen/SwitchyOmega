@@ -4,6 +4,7 @@ Log = require './log'
 Storage = require './storage'
 OmegaPac = require 'omega-pac'
 jsondiffpatch = require 'jsondiffpatch'
+ProxyEnvironmentProfiles = require './proxy_environment_profiles'
 
 
 generateSHA256 = (text) ->
@@ -348,6 +349,13 @@ class Options
         delete profile['syncError']
     if version == 2
       # Current schemaVersion.
+      normalized = ProxyEnvironmentProfiles.normalize(options)
+      normalizedChanges = ProxyEnvironmentProfiles.changesFor(
+        options, normalized)
+      for own key, value of normalizedChanges
+        if JSON.stringify(options[key]) != JSON.stringify(value)
+          options[key] = value
+          changes[key] = value
       Promise.resolve([options, changes])
     else
       Promise.reject new Error("Invalid schemaVersion #{version}!")
@@ -440,6 +448,24 @@ class Options
     @_setOptions(changes)
 
   _setOptions: (changes, args) =>
+    normalizeProxyEnvironment = false
+    for key in ProxyEnvironmentProfiles.OPTION_KEYS
+      if Object::hasOwnProperty.call(changes, key)
+        normalizeProxyEnvironment = true
+        break
+    if normalizeProxyEnvironment
+      prospective = {}
+      prospective[key] = value for own key, value of @_options
+      for own key, value of changes
+        if typeof value == 'undefined'
+          delete prospective[key]
+        else
+          prospective[key] = value
+      normalized = ProxyEnvironmentProfiles.normalize(prospective)
+      normalizedChanges = ProxyEnvironmentProfiles.changesFor(
+        prospective, normalized)
+      changes[key] = value for own key, value of normalizedChanges
+
     removed = []
     checkRev = args?.checkRevision ? false
     profilesChanged = false
@@ -525,6 +551,22 @@ class Options
           @_setOptions({'-monitorWebRequests': true}, {persist: true})
         @setMonitorWebRequests(monitorWebRequests)
 
+      proxyEnvironmentChanged = changes == @_options
+      unless proxyEnvironmentChanged
+        for key in ProxyEnvironmentProfiles.OPTION_KEYS
+          if Object::hasOwnProperty.call(changes, key)
+            proxyEnvironmentChanged = true
+            break
+      if proxyEnvironmentChanged or
+      Object::hasOwnProperty.call(changes, '-proxyEnvironmentEnabled')
+        normalized = ProxyEnvironmentProfiles.normalize(@_options)
+        @_state.set({
+          proxyEnvironmentEnabled:
+            @_options['-proxyEnvironmentEnabled'] == true
+          proxyEnvironmentProfiles: normalized.profiles
+          proxyEnvironmentActiveProfileId: normalized.activeProfileId
+        })
+
     handler()
     @_storage.watch null, handler
 
@@ -583,6 +625,11 @@ class Options
   # @returns {function} Calling the returned function will stop watching.
   ###
   watch: (callback) -> @_storage.watch null, callback
+
+  selectProxyEnvironmentProfile: (id) ->
+    selection = ProxyEnvironmentProfiles.select(@_options, id)
+    return Promise.resolve({refreshActivePage: false}) unless selection.changed
+    @_setOptions(selection.changes).then -> {refreshActivePage: 'force'}
 
   _profileNotFound: (name) ->
     @log.error("Profile #{name} not found! Things may go very, very wrong.")

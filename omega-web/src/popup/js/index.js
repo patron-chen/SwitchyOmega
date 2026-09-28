@@ -1,11 +1,13 @@
 (function() {
   handleClick('js-option', showOptions);
   handleClick('js-temprule', showTempRuleDropdown);
+  handleClick('js-proxy-environment-toggle', showProxyEnvironmentDropdown);
   handleClick('js-direct', applyProfile.bind(this, 'direct'));
   handleClick('js-system', applyProfile.bind(this, 'system'));
   OmegaPopup.addTempRule = addTempRule;
   OmegaPopup.setDefaultProfile = setDefaultProfile;
   OmegaPopup.applyProfile = applyProfile;
+  OmegaPopup.selectProxyEnvironmentProfile = selectProxyEnvironmentProfile;
   return;
 
   function handleClick(id, handler) {
@@ -35,6 +37,12 @@
     });
   }
 
+  function selectProxyEnvironmentProfile(id) {
+    $script.ready('om-target', function() {
+      OmegaTargetPopup.selectProxyEnvironmentProfile(id, closePopup);
+    });
+  }
+
   function setDefaultProfile(profileName, defaultProfileName) {
     $script.ready('om-target', function() {
       OmegaTargetPopup.setDefaultProfile(profileName, defaultProfileName,
@@ -51,6 +59,12 @@
   function showTempRuleDropdown() {
     $script.ready('om-dropdowns', function() {
       OmegaPopup.showTempRuleDropdown();
+    });
+  }
+
+  function showProxyEnvironmentDropdown() {
+    $script.ready('om-proxy-environment-dropdown', function() {
+      OmegaPopup.showProxyEnvironmentDropdown();
     });
   }
 })();

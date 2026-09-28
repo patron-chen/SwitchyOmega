@@ -253,6 +253,7 @@ zeroBackground = (zeroStorage, opts) ->
 
   proxyEnvironment = new OmegaTargetCurrent.ProxyEnvironmentManager(
     options, Log)
+  state.set(proxyEnvironmentSupported: proxyEnvironment.supported())
   proxyEnvironment.init()
 
   options.externalApi = new OmegaTargetCurrent.ExternalApi(options)
@@ -439,8 +440,9 @@ zeroBackground = (zeroStorage, opts) ->
     else
       obj
 
-  refreshActivePageIfEnabled = ->
-    return if zeroStorage['omega.local.refreshOnProfileChange'] == 'false'
+  refreshActivePageIfEnabled = (force = false) ->
+    return if not force and
+      zeroStorage['omega.local.refreshOnProfileChange'] == 'false'
     chrome.tabs.query {active: true, lastFocusedWindow: true}, (tabs) ->
       url = tabs[0].pendingUrl or tabs[0].url
       return if not url
@@ -496,7 +498,9 @@ zeroBackground = (zeroStorage, opts) ->
 
       promise = Promise.resolve().then -> method.apply(target, request.args)
       if request.refreshActivePage
-        promise.then refreshActivePageIfEnabled
+        promise.then (result) ->
+          return if result?.refreshActivePage == false
+          refreshActivePageIfEnabled(result?.refreshActivePage == 'force')
       return if request.noReply
 
       promise.then (result) ->
